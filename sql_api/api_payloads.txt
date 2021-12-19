@@ -1,0 +1,112 @@
+# API Payloads
+
+create
+
+{
+    "operation":"create",
+    "host":"localhost",
+    "user":"root",
+    "password":"root",
+    "db":"db1",
+    "table":"tb2",
+    "columns":{"iD":"INT","Name":"VARCHAR(20)"}
+}
+
+------------------------------------------------------------------------------------------------------------
+insert
+
+{
+    "operation":"insert",
+    "host":"localhost",
+    "user":"root",
+    "password":"root",
+    "db":"db1",
+    "table":"tb2",
+    "data":"(1,'abc'),(2,'xyz')"        #"data seprated by comma
+}
+---------------------------------------------------------------------------------------------------------
+update
+
+{
+    "operation":"update",
+    "host":"localhost",
+    "user":"root",
+    "password":"root",
+    "db":"db1",
+    "table":"tb2",
+    "set":"Name='xyz'",
+    "where":"iD=2 or Name='xyz'"
+}
+---------------------------------------------------------------------------------------------------------
+delete
+
+{
+    "operation":"delete",
+    "host":"localhost",
+    "user":"root",
+    "password":"root",
+    "db":"db1",
+    "table":"tb2",
+    "where":"iD=1"
+}
+-----------------------------------------------------------------------------------------------
+Download
+
+Note: you can only download data to scure_file_priv folder that is set by mys sql (you can change file path as well)
+
+SHOW VARIABLES LIKE "secure_file_priv";
++------------------+-----------------------+
+| Variable_name    | Value                 |
++------------------+-----------------------+
+| secure_file_priv | /var/lib/mysql-files/ |
++------------------+-----------------------+
+1. change the path as per your requirement
+2. set permission to that folder and all files inside that folder using APPARMOR
+https://stackoverflow.com/questions/36391551/error-1-hy000-cant-create-write-to-file-errcode-13-permission-denied
+3. chenge file mode to 777 -- #chmod 777 file_name
+4. after that change the mode of file as well 
+
+{
+    "operation":"download",
+    "host":"localhost",
+    "user":"root",
+    "password":"root",
+    "db":"db1",
+    "table":"tb2",
+    "where":"iD=1"
+}
+
+Download with Headers - https://database.guide/how-to-save-a-mysql-query-result-to-a-csv-file/
+--------------------------------------------------------------------------------------------
+Bulk
+
+Note : if local_infile is not enabled you will get this error - ERROR 3950 (42000): Loading local data is disabled; this must be
+enabled on both the client and server side.
+
+to enable local_infile perform below steps:
+1. mysql> show global variables like 'local_infile';
+
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| local_infile  |  OFF  |
++---------------+-------+
+(this means local_infile is disable)
+
+2. enabling local_infile
+mysql> set global local_infile=true;
+mysql> exit
+mysql --local_infile=1 -u root -ppassword DB_name
+
+https://stackoverflow.com/questions/59993844/error-loading-local-data-is-disabled-this-must-be-enabled-on-both-the-client
+
+{
+    "operation":"bulk",
+    "host":"localhost",
+    "user":"root",
+    "password":"root",
+    "db":"db1",
+    "table":"tb2",
+    "columns":"iD,Name",    #column names seprated by comma
+    "filepath":"file_path"
+}
